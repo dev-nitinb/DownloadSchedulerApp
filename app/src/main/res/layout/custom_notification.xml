@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:orientation="horizontal"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:background="#B5B2B2">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/appCompatImageView"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/ic_launcher_foreground"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+ <LinearLayout
+     android:orientation="vertical"
+     android:layout_width="wrap_content"
+     android:layout_height="match_parent">
+     <TextView
+         android:textStyle="bold"
+         android:id="@+id/tvTitle"
+         style="android:TextAppearance.StatusBar.EventContent"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_weight="1"
+         android:text="Title "
+         app:layout_constraintStart_toEndOf="@+id/appCompatImageView"
+         app:layout_constraintTop_toTopOf="@+id/appCompatImageView" />
+
+     <TextView
+         android:id="@+id/tvInfo"
+         style="android:TextAppearance.StatusBar.EventContent"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_weight="1"
+         android:text="Info "
+         app:layout_constraintBottom_toBottomOf="parent"
+         app:layout_constraintEnd_toEndOf="@+id/tvTitle"
+         app:layout_constraintHorizontal_bias="0.0"
+         app:layout_constraintStart_toEndOf="@+id/appCompatImageView"
+         app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
+ </LinearLayout>
+
+</LinearLayout>

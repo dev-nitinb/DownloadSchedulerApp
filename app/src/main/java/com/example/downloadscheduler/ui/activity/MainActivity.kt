@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
         bindView()
 
     }
@@ -31,6 +32,8 @@ class MainActivity : AppCompatActivity() {
         clParent=findViewById(R.id.clParent)
         fabAddTimer=findViewById(R.id.fabAddTimer)
         mProjectUtils= ProjectUtils.getInstance(this)
+
+        //check permission granted or not
         checkPermission()
     }
 

@@ -22,6 +22,7 @@ class ViewFilesActivity : AppCompatActivity() {
         rvFiles=findViewById(R.id.rvFiles)
         Log.e(TAG,"$alUrl")
 
+        //display file name in activity
        var mAdapter = RecyclerViewAdapter( alUrl)
         val linearLayoutManager: RecyclerView.LayoutManager = LinearLayoutManager(this)
         rvFiles.layoutManager = linearLayoutManager

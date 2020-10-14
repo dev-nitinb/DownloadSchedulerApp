@@ -91,6 +91,7 @@ class AddTimerActivity : AppCompatActivity() {
         }
     }
 
+    //add dynamic layout
     private fun addUrlView() {
         // add max 5 childs
         if (totalUrlCounter < 5) {
@@ -116,6 +117,7 @@ class AddTimerActivity : AppCompatActivity() {
         }
     }
 
+    //remove dynamic view
     private fun removeView(view: View) {
         if (totalUrlCounter == 1) {
             btnAddTimer.visibility = View.GONE
@@ -132,6 +134,7 @@ class AddTimerActivity : AppCompatActivity() {
         }
     }
 
+    //validate dynamic edit text url
     private fun dynamicLayoutValidation(): Boolean {
         alUrl.clear()
         var isValidation = true
@@ -154,6 +157,7 @@ class AddTimerActivity : AppCompatActivity() {
         return isValidation
     }
 
+    //hide keyboard
     private fun hideKeyboard() {
         val view = this.currentFocus
         view?.let { v ->
@@ -162,6 +166,7 @@ class AddTimerActivity : AppCompatActivity() {
         }
     }
 
+    //write file in download folder
     private fun writeResponseBodyToDisk(body: ResponseBody, fileName: String): Boolean {
         return try {
             val futureStudioIconFile = File(
@@ -201,6 +206,7 @@ class AddTimerActivity : AppCompatActivity() {
         }
     }
 
+    //download file using url
     private fun downloadFileFromUrl(
         fileUrlString: String,
         currentFileNumber: Int,
@@ -258,6 +264,7 @@ class AddTimerActivity : AppCompatActivity() {
         })
     }
 
+    //play sound after download
     fun playNotificationSound(){
         var notification=RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         var mediaPlayer= MediaPlayer.create(applicationContext, notification)

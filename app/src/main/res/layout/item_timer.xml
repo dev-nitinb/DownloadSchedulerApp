@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/parent_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    android:background="@drawable/round_border_primary_color"
+    android:orientation="vertical"
+    android:padding="5dp">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:padding="5dp"
+        android:id="@+id/tvTimerDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:background="@drawable/round_primary_color"
+        android:text="dflfklf"
+        android:textColor="@color/colorWhite"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvUrl1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:text="dflfklf"
+        android:textColor="@color/colorGrey"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvUrl2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:layout_marginLeft="5dp"
+        android:text="dflfklf"
+        android:textColor="@color/colorGrey"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvUrl3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:layout_marginLeft="5dp"
+        android:text="dflfklf"
+        android:textColor="@color/colorGrey"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvUrl4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:layout_marginLeft="5dp"
+        android:text="dflfklf"
+        android:textColor="@color/colorGrey"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvUrl5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:layout_marginLeft="5dp"
+        android:text="dflfklf"
+        android:textColor="@color/colorGrey"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+</androidx.appcompat.widget.LinearLayoutCompat>

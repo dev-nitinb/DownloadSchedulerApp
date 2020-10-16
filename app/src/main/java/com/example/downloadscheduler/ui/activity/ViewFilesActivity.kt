@@ -6,7 +6,7 @@ import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.downloadscheduler.R
-import com.example.downloadscheduler.adapter.RecyclerViewAdapter
+import com.example.downloadscheduler.adapter.ViewFilesAdapter
 
 class ViewFilesActivity : AppCompatActivity() {
 
@@ -23,7 +23,7 @@ class ViewFilesActivity : AppCompatActivity() {
         Log.e(TAG,"$alUrl")
 
         //display file name in activity
-       var mAdapter = RecyclerViewAdapter( alUrl)
+       var mAdapter = ViewFilesAdapter( alUrl)
         val linearLayoutManager: RecyclerView.LayoutManager = LinearLayoutManager(this)
         rvFiles.layoutManager = linearLayoutManager
         rvFiles.adapter = mAdapter

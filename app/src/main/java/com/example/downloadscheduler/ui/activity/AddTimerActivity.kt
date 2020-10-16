@@ -1,42 +1,35 @@
 package com.example.downloadscheduler.ui.activity
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Context
-import android.content.Intent
-import android.graphics.Color
-import android.media.MediaPlayer
-import android.media.RingtoneManager
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.RemoteViews
+import android.widget.DatePicker
+import android.widget.TimePicker
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.LinearLayoutCompat
-import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
 import com.example.downloadscheduler.R
 import com.example.downloadscheduler.api.DownloadServiceApi
 import com.example.downloadscheduler.api.RetrofitInstance
+import com.example.downloadscheduler.db.database.TimerRoomDatabase
+import com.example.downloadscheduler.db.entities.TimerTable
 import com.example.downloadscheduler.utils.ProjectUtils
-import com.example.downloadscheduler.utils.PublicDownloadStorageDir
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import okhttp3.ResponseBody
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.io.*
-import java.net.URI
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.util.*
+import kotlin.collections.ArrayList
 
 
-class AddTimerActivity : AppCompatActivity() {
+class AddTimerActivity : AppCompatActivity(), TimePickerDialog.OnTimeSetListener,
+    DatePickerDialog.OnDateSetListener {
 
     var TAG= "AddTimerActivity"
     lateinit var llDynamicView: LinearLayoutCompat
@@ -48,6 +41,16 @@ class AddTimerActivity : AppCompatActivity() {
     lateinit var mProjectUtils: ProjectUtils
     lateinit var retrofitService: DownloadServiceApi
     var totalFilesDownloaded=0
+    lateinit var mTtimerDb: TimerRoomDatabase
+
+    var selectedYear:Int=0
+    var selectedMonth:Int=0
+    var selectedDay:Int=0
+    var selectedHour:Int=0
+    var selectedMinute:Int=0
+    var currentDate=""
+
+    lateinit var calendar:Calendar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,6 +70,9 @@ class AddTimerActivity : AppCompatActivity() {
         supportActionBar!!.title = "Add Timer"
         mProjectUtils=ProjectUtils.getInstance(this@AddTimerActivity)
         retrofitService= RetrofitInstance.api
+        mTtimerDb=TimerRoomDatabase.getInstance(this)
+
+        calendar=Calendar.getInstance()
 
         setListener()
     }
@@ -80,13 +86,26 @@ class AddTimerActivity : AppCompatActivity() {
             hideKeyboard()
 
             if(dynamicLayoutValidation()){
-                sendNotification("File Downloading Started")
+
+               /* sendNotification("File Downloading Started")
                 var totalNumberOfFiles=alUrl.size
                 for (i in 0 until totalNumberOfFiles){
                     var currentFileNumber= i+1
                     downloadFileFromUrl(alUrl[i], currentFileNumber, totalNumberOfFiles)
                 }
-                totalFilesDownloaded=0
+                totalFilesDownloaded=0*/
+
+                var currentYear = calendar.get(Calendar.YEAR)
+                var currentMonth = calendar.get(Calendar.MONTH)+1
+                var currentDay = calendar.get(Calendar.DAY_OF_MONTH)
+                currentDate="$currentDay/$currentMonth/$currentYear"
+                //mProjectUtils.showSnackbarMessage(nestedScrollView,"Date: $currentDate")
+
+                var datePickerDialog=DatePickerDialog(this, this, currentYear, currentMonth-1, currentDay)
+                datePickerDialog.datePicker.minDate=System.currentTimeMillis()-1000
+                //max i month after current date
+                //datePickerDialog.datePicker.maxDate=System.currentTimeMillis()
+                datePickerDialog.show()
             }
         }
     }
@@ -166,155 +185,84 @@ class AddTimerActivity : AppCompatActivity() {
         }
     }
 
-    //write file in download folder
-    private fun writeResponseBodyToDisk(body: ResponseBody, fileName: String): Boolean {
-        return try {
-            val futureStudioIconFile = File(
-                PublicDownloadStorageDir.getPublicDownloadStorageDir(),
-                fileName
-            )
-            var inputStream: InputStream? = null
-            var outputStream: OutputStream? = null
-            try {
-                val fileReader = ByteArray(4096)
-                val fileSize = body.contentLength()
-                var fileSizeDownloaded: Long = 0
-                inputStream = body.byteStream()
-                outputStream = FileOutputStream(futureStudioIconFile)
-                while (true) {
-                    val read: Int = inputStream.read(fileReader)
-                    if (read == -1) {
-                        break
-                    }
-                    outputStream!!.write(fileReader, 0, read)
-                    fileSizeDownloaded += read.toLong()
-                    //Log.e(TAG, "File download: $fileSizeDownloaded of $fileSize")
-                }
-                outputStream!!.flush()
-                true
-            } catch (e: IOException) {
-                Log.e(TAG, e.message)
-                false
-            } finally {
-                inputStream?.close()
-                outputStream?.close()
-            }
-        }
-        catch (e: IOException) {
-            Log.e(TAG, e.message)
-            false
+    private fun insertTimerInDb(timerTable: TimerTable){
+        CoroutineScope(Dispatchers.IO).launch {
+            mTtimerDb.timerDao().insertTimer(timerTable)
         }
     }
 
-    //download file using url
-    private fun downloadFileFromUrl(
-        fileUrlString: String,
-        currentFileNumber: Int,
-        totalNumberOfFiles: Int
-    ){
-        var fileName=File(URI(fileUrlString).path).name
-        Log.e(TAG, "Start Download File name: $fileName")
-        var call: Call<ResponseBody> = retrofitService.downloadFileWithDynamicUrlSync(fileUrlString)
-        Log.e(TAG, "Call api")
-        call.enqueue(object : Callback<ResponseBody> {
-            override fun onResponse(
-                call: Call<ResponseBody>, response: Response<ResponseBody>
-            ) {
-                if (response.isSuccessful && response.body() != null) {
-                    Log.e(TAG, "Server contacted and has file $fileName")
+    override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
+        selectedYear=year
+        selectedMonth=month+1
+        selectedDay=dayOfMonth
 
-                    val writtenToDisk: Boolean = writeResponseBodyToDisk(
-                        response.body()!!,
-                        fileName
-                    )
-                    if (writtenToDisk) {
-                        mProjectUtils.showSnackbarMessage(nestedScrollView, "Success")
-                        totalFilesDownloaded++
+        var selectedDate="$selectedDay/$selectedMonth/$selectedYear"
+        //mProjectUtils.showSnackbarMessage(nestedScrollView,"Date: $selectedDate")
 
-                        mProjectUtils.showSnackbarMessage(
-                            nestedScrollView,
-                            "File $currentFileNumber downloaded"
-                        )
-                        Log.e(TAG, "File download was a success? $writtenToDisk")
-                        Log.e(TAG, "$totalFilesDownloaded of $totalNumberOfFiles downloaded")
-                        playNotificationSound()
-                        sendNotification("$totalFilesDownloaded / $totalNumberOfFiles files downloaded")
+        lateinit var timePickerDialog:TimePickerDialog
+        timePickerDialog = if(selectedDate == currentDate){
+            var currentHour=calendar.get(Calendar.HOUR_OF_DAY)
+            var currentMinute=calendar.get(Calendar.MINUTE)
+            TimePickerDialog(this,this,currentHour,currentMinute+3,true)
+        } else{
+            TimePickerDialog(this,this,0,0,true)
+        }
 
-                        if (totalFilesDownloaded == totalNumberOfFiles) {
-                            mProjectUtils.showSnackbarMessage(
-                                nestedScrollView,
-                                "All files downloaded successfully!"
-                            )
-                            sendNotification("All files downloaded successfully!")
-                        }
-                    } else {
-                        Log.e(TAG, "Failed to download  $currentFileNumber")
-                    }
+        timePickerDialog.show()
+    }
 
-                } else {
-                    Log.d(TAG, "server contact failed")
+    override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
+        selectedHour=hourOfDay
+        selectedMinute=minute
+       // mProjectUtils.showSnackbarMessage(nestedScrollView,"Date: $selectedHour/$selectedMinute")
+
+        if (selectedYear == calendar.get(Calendar.YEAR)
+            && selectedMonth == calendar.get(Calendar.MONTH)+1
+            && selectedDay == calendar.get(Calendar.DAY_OF_MONTH)
+            && (selectedHour < calendar.get(Calendar.HOUR_OF_DAY) || (selectedHour == calendar.get(Calendar.HOUR_OF_DAY) && selectedMinute <= (calendar.get(Calendar.MINUTE)+1)))
+        ) {
+            mProjectUtils.showSnackbarMessage(nestedScrollView,"Set time at least 2 minute from now")
+        } else {
+            var selectedDate="$selectedDay/$selectedMonth/$selectedYear $selectedHour:$selectedMinute"
+            mProjectUtils.showSnackbarMessage(nestedScrollView,"Date: $selectedDate")
+            var url1=""
+            var url2=""
+            var url3=""
+            var url4=""
+            var url5=""
+            when (alUrl.size) {
+                1 -> {
+                    url1 = alUrl[0]
+                }
+                2 -> {
+                    url1 = alUrl[0]
+                    url2 = alUrl[1]
+                }
+                3 -> {
+                    url1 = alUrl[0]
+                    url2 = alUrl[1]
+                    url3 = alUrl[2]
+                }
+                4 -> {
+                    url1 = alUrl[0]
+                    url2 = alUrl[1]
+                    url3 = alUrl[2]
+                    url4 = alUrl[3]
+                }
+                5 -> {
+                    url1 = alUrl[0]
+                    url2 = alUrl[1]
+                    url3 = alUrl[2]
+                    url4 = alUrl[3]
+                    url5 = alUrl[4]
                 }
             }
+            var timerTable=TimerTable(selectedDate,url1, url2, url3, url4, url5)
+            insertTimerInDb(timerTable)
+            mProjectUtils.showSnackbarMessage(nestedScrollView,"Timer set successfully!")
 
-            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-
-                mProjectUtils.showSnackbarMessage(nestedScrollView, "Failed")
-                Log.e(TAG, "error")
-            }
-        })
-    }
-
-    //play sound after download
-    fun playNotificationSound(){
-        var notification=RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        var mediaPlayer= MediaPlayer.create(applicationContext, notification)
-        mediaPlayer.start()
-    }
-
-    fun sendNotification(message: String) {
-        //notification manager
-        val mNotificationManager = this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        //create channel
-        val idChannel = "channel_01"
-        var mChannel: NotificationChannel? = null
-        val importance = NotificationManager.IMPORTANCE_HIGH
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            mChannel = NotificationChannel(idChannel, "Download Update", importance)
-            // Configure the notification channel.
-            mChannel.enableLights(true)
-            mChannel.lightColor = Color.RED
-            mChannel.vibrationPattern = longArrayOf(100, 200, 300, 400, 500, 400, 300, 200, 400)
-            mNotificationManager.createNotificationChannel(mChannel)
+            onBackPressed()
         }
-
-        //intent
-        val mainIntent = Intent(this, ViewFilesActivity::class.java)
-        Log.e(TAG,"$alUrl")
-        mainIntent.putExtra("alUrl",alUrl)
-        val pendingIntent = PendingIntent.getActivity(this, 0, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-
-/*
-        //custom notification view
-        val notificationtView = RemoteViews(packageName, R.layout.custom_notification)
-        notificationtView.setTextViewText(R.id.tvTitle, "Downloading Files")
-        notificationtView.setTextViewText(R.id.tvInfo, "$message")
-*/
-
-        //notification builder
-        val builder = NotificationCompat.Builder(this, idChannel)
-        builder
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentIntent(pendingIntent)
-            .setContentTitle("Downloading Files")
-            .setContentText("$message")
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setColor(ContextCompat.getColor(this, R.color.colorBlack))
-            .setVibrate(longArrayOf(100, 250))
-            .setLights(Color.YELLOW, 500, 5000)
-            .setAutoCancel(false)
-
-        mNotificationManager.notify(1, builder.build())
 
     }
 }

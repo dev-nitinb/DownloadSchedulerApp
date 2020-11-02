@@ -1,18 +1,12 @@
 # DownloadSchedulerApp
-Android Application which downloads file from url in background.
-
-Max 5 files downloadable URLs can be added in a list. User can set the timer using time picker so that user can schedule a download time to download files even though the application is not in the background. 
-Their is a custom Notification view where user can see the download progress like  1/5...2/5...3/5 downloaded. Once download is complete it will play a sound and when a user clicks on Download complete Notification dialog it should show the downloaded item list in the app itself.
+Demo apllication that fetches the data from API using retrofit and displays the data in recycler view with a pie chart on the top.
 
 #### Concepts Used
-1. Dynamic permission request
-2. Dynamically add view
-3. Date Timer Picker
-4. Room Db
-5. Retrofit Download File
-6. Store Download File in memory
-7. Timer Service
-8. Notification
+1. MVVM
+2. Retrofit
+3. Room Db
+4. Pie Chart
+5. Singleton Class
 
 #### Concept reference resources:
 1. [Android Dynamic Views](https://www.youtube.com/watch?v=EJrmgJT2NnI)
